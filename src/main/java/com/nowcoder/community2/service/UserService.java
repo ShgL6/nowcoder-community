@@ -3,7 +3,7 @@ package com.nowcoder.community2.service;
 import com.nowcoder.community2.dao.UserMapper;
 import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.utils.CommonUtils;
-import com.nowcoder.community2.utils.Const;
+import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.HostHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -17,10 +17,7 @@ import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -66,24 +63,24 @@ public class UserService {
             throw new IllegalArgumentException("参数不能为空！");
         }
         if(StringUtils.isBlank(user.getUsername())){
-            map.put("usernameMsg",Const.USERNAME_EMPTY.getInfo());
+            map.put("usernameMsg", Notice.USERNAME_EMPTY.getInfo());
             return map;
         }
         if(StringUtils.isBlank(user.getPassword())){
-            map.put("passwordMsg",Const.PASSWORD_EMPTY.getInfo());
+            map.put("passwordMsg", Notice.PASSWORD_EMPTY.getInfo());
             return map;
         }
 
         // 2.1 验证用户是否已存在
         User userByName = userMapper.selectByName(user.getUsername());
         if(userByName != null){
-            map.put("userMsg",Const.USER_ALREADY_EXISTS.getInfo());
+            map.put("userMsg", Notice.USER_ALREADY_EXISTS.getInfo());
             return map;
         }
         // 2.2 验证邮箱是否被注册
         User userByEmail = userMapper.selectByEmail(user.getEmail());
         if(userByEmail != null){
-            map.put("emailMsg",Const.USER_ALREADY_EXISTS.getInfo());
+            map.put("emailMsg", Notice.USER_ALREADY_EXISTS.getInfo());
             return map;
         }
 
@@ -112,7 +109,7 @@ public class UserService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
             helper.setFrom(from);
-            helper.setSubject(Const.WELCOME.getInfo());
+            helper.setSubject(Notice.WELCOME.getInfo());
             helper.setTo(user.getEmail());
 
             Context context = new Context();
@@ -134,18 +131,18 @@ public class UserService {
     }
 
 
-    public Const activate(String id,String activationCode){
+    public Notice activate(String id, String activationCode){
         User userById = userMapper.selectById(Integer.valueOf(id));
         if(userById == null || !userById.getActivationCode().equals(activationCode)){
-            return Const.ACTIVATE_FAIL;
+            return Notice.ACTIVATE_FAIL;
         }
         if(userById.getStatus() == 1){
-            return Const.ACTIVATE_ALREADY;
+            return Notice.ACTIVATE_ALREADY;
         }
 
         userMapper.updateStatus(userById.getId(),1);
 
-        return Const.ACTIVATE_SUCCESS;
+        return Notice.ACTIVATE_SUCCESS;
     }
 
 
@@ -161,27 +158,27 @@ public class UserService {
 
         // 1.为提高效率 先校验验证码,再校验 username 和 password
         if(StringUtils.isBlank(verifyCode) || StringUtils.isBlank(code) || !StringUtils.equalsIgnoreCase(code,verifyCode)){
-            map.put("codeMsg",Const.CODE_ERROR.getInfo());
+            map.put("codeMsg", Notice.CODE_ERROR.getInfo());
             return map;
         }
         if(StringUtils.isBlank(username)){
-            map.put("usernameMsg",Const.USERNAME_EMPTY.getInfo());
+            map.put("usernameMsg", Notice.USERNAME_EMPTY.getInfo());
             return map;
         }
         if(StringUtils.isBlank(username)){
-            map.put("passwordMsg",Const.PASSWORD_EMPTY.getInfo());
+            map.put("passwordMsg", Notice.PASSWORD_EMPTY.getInfo());
             return map;
         }
 
         // 2.查询用户是否存在，密码是否正确
         User user = userMapper.selectByName(username);
         if(user == null){
-            map.put("usernameMsg",Const.USER_NOT_EXIST.getInfo());
+            map.put("usernameMsg", Notice.USER_NOT_EXIST.getInfo());
             return map;
         }
         String passwordInput = CommonUtils.md5(password + user.getSalt());
         if(! StringUtils.equals(passwordInput,user.getPassword()) ){
-            map.put("passwordMsg",Const.PASSWORD_ERROR.getInfo());
+            map.put("passwordMsg", Notice.PASSWORD_ERROR.getInfo());
             return map;
         }
 
@@ -205,23 +202,23 @@ public class UserService {
         Map<String,Object> map = new HashMap<>();
         // 检验新密码
         if(StringUtils.isBlank(newPassword)){
-            map.put("newMsg",Const.PASSWORD_EMPTY.getInfo());
+            map.put("newMsg", Notice.PASSWORD_EMPTY.getInfo());
             return map;
         }
         if(newPassword.length() < 8){
-            map.put("newMsg",Const.PASSWORD_INVALID.getInfo());
+            map.put("newMsg", Notice.PASSWORD_INVALID.getInfo());
             return map;
         }
         // 检验两次输入的密码是否一致
         if(! StringUtils.equals(newPassword,confirmPassword)){
-            map.put("confMsg",Const.PASSWORD_NOT_CONSISTENT.getInfo());
+            map.put("confMsg", Notice.PASSWORD_NOT_CONSISTENT.getInfo());
             return map;
         }
 
         User user = hostHolder.get();
         String password = CommonUtils.md5(oldPassword + user.getSalt());
         if(! StringUtils.equals(user.getPassword(),password)){
-            map.put("oldMsg",Const.PASSWORD_ERROR.getInfo());
+            map.put("oldMsg", Notice.PASSWORD_ERROR.getInfo());
             return map;
         }
 
@@ -230,4 +227,7 @@ public class UserService {
     }
 
 
+    public List<User> findUserByIds(List<Integer> userIds) {
+        return userMapper.selectByIds(userIds);
+    }
 }

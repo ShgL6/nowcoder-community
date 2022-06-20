@@ -24,7 +24,7 @@ public class KafkaTest {
     public void test() throws InterruptedException {
         producer.send("test","hello world");
         producer.send("test","you can do it");
-        Thread.sleep(60000);
+        Thread.sleep(10000);
     }
 
 

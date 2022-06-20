@@ -43,6 +43,8 @@ public class ServiceLogAspect {
         String name = point.getSignature().getName();
         String method = declaringTypeName + name;
 
+
+
         logger.debug(String.format("用户[%s]，在[%s],访问了[%s]",remoteHost, time,method));
 
     }

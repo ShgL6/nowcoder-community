@@ -3,7 +3,7 @@ package com.nowcoder.community2.interceptor;
 import com.nowcoder.community2.annotation.LoginRequired;
 import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.utils.CommonUtils;
-import com.nowcoder.community2.utils.Const;
+import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +38,7 @@ public class LoginRequiredInterceptor implements HandlerInterceptor {
 
                     if("XMLHttpRequest".equals(header)){
                         // 异步 ajax
-                        String jsonString = CommonUtils.getJSONString(-1, Const.USER_NOT_LOGIN.getInfo());
+                        String jsonString = CommonUtils.getJSONString(-1, Notice.USER_NOT_LOGIN.getInfo());
                         response.setContentType("application/plain;charset=utf-8");
                         response.getWriter().write(jsonString);
                     }else{

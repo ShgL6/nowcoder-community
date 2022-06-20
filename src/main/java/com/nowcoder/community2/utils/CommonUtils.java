@@ -4,10 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.DigestUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
 public class CommonUtils {
+
+    public final static String SPILT = "@";
 
     // 生成随机字符串
     public static String getUUID(){
@@ -59,6 +63,10 @@ public class CommonUtils {
         return getJSONString(code,null);
     }
 
+    public static String getFollowValue(int userId,Date date){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return userId + SPILT + format.format(date);
+    }
 
 
 

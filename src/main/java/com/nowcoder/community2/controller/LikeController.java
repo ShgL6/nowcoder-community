@@ -1,11 +1,9 @@
 package com.nowcoder.community2.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.nowcoder.community2.annotation.LoginRequired;
 import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.service.LikeService;
 import com.nowcoder.community2.utils.CommonUtils;
-import com.nowcoder.community2.utils.Const;
 import com.nowcoder.community2.utils.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -4,11 +4,15 @@ import com.nowcoder.community2.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @Mapper
 public interface UserMapper {
 
     User selectById(int id);
+
+    List<User> selectByIds(List<Integer> userIds);
 
     User selectByName(String username);
 

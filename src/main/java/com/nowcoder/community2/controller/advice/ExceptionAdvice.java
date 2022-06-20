@@ -1,7 +1,7 @@
 package com.nowcoder.community2.controller.advice;
 
 import com.nowcoder.community2.utils.CommonUtils;
-import com.nowcoder.community2.utils.Const;
+import com.nowcoder.community2.utils.Notice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -20,7 +20,7 @@ public class ExceptionAdvice {
     @ExceptionHandler(Exception.class)
     public void handleException(Exception e, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        logger.error("服务器发生异常！",e.getMessage());
+        logger.error("服务器发生异常！" + e.getMessage());
         for(StackTraceElement element : e.getStackTrace()){
             logger.error(element.toString());
         }
@@ -29,7 +29,7 @@ public class ExceptionAdvice {
         //判断异步请求
         if("XMLHttpRequest".equals(header)){
             response.setContentType("application/plain;charset=utf-8");
-            response.getWriter().write(CommonUtils.getJSONString(500, Const.SERVER_INTERN_ERROR.getInfo()));
+            response.getWriter().write(CommonUtils.getJSONString(500, Notice.SERVER_INTERN_ERROR.getInfo()));
         }else{
             response.sendRedirect(request.getContextPath() + "/error/500");
         }

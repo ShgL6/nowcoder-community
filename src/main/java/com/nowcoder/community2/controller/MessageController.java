@@ -7,7 +7,7 @@ import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.service.MessageService;
 import com.nowcoder.community2.service.UserService;
 import com.nowcoder.community2.utils.CommonUtils;
-import com.nowcoder.community2.utils.Const;
+import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.HostHolder;
 import com.nowcoder.community2.utils.SensitiveFilter;
 import org.apache.commons.lang.StringUtils;
@@ -139,12 +139,12 @@ public class MessageController {
     public String sendLetter(String toUsername,String content){
 
         if(StringUtils.isBlank(toUsername)){
-            return CommonUtils.getJSONString(101,Const.TITLE_EMPTY.getInfo());
+            return CommonUtils.getJSONString(101, Notice.TITLE_EMPTY.getInfo());
         }
 
         User toUser = userService.findUserByName(toUsername);
         if(toUser == null){
-            return CommonUtils.getJSONString(102,Const.USER_NOT_EXIST.getInfo());
+            return CommonUtils.getJSONString(102, Notice.USER_NOT_EXIST.getInfo());
         }
 
         Message message = new Message();
@@ -159,7 +159,7 @@ public class MessageController {
 
         messageService.saveMessage(message);
 
-        return CommonUtils.getJSONString(0, Const.SEND_SUCCESS.getInfo());
+        return CommonUtils.getJSONString(0, Notice.SEND_SUCCESS.getInfo());
     }
 
 

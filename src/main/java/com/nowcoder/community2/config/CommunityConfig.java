@@ -48,12 +48,13 @@ public class CommunityConfig {
         // key 的序列化方式
         redisTemplate.setKeySerializer(RedisSerializer.string());
         // value 的序列化方式
-        redisTemplate.setValueSerializer(RedisSerializer.string());
+        redisTemplate.setValueSerializer(RedisSerializer.json());
+
 
         // hash 的 key 的序列化方式
-        redisTemplate.setKeySerializer(RedisSerializer.string());
+        redisTemplate.setHashKeySerializer(RedisSerializer.json());
         // hash 的 value 的序列化方式
-        redisTemplate.setValueSerializer(RedisSerializer.json());
+        redisTemplate.setHashValueSerializer(RedisSerializer.json());
 
         redisTemplate.afterPropertiesSet();
 

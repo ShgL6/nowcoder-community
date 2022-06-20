@@ -8,7 +8,7 @@ import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.service.LoginTicketService;
 import com.nowcoder.community2.service.UserService;
 
-import com.nowcoder.community2.utils.Const;
+import com.nowcoder.community2.utils.Notice;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,17 +163,17 @@ public class LoginController {
 
         switch (userService.activate(id, activationCode)){
             case ACTIVATE_FAIL: {
-                model.addAttribute("msg",Const.ACTIVATE_FAIL.getInfo());
+                model.addAttribute("msg", Notice.ACTIVATE_FAIL.getInfo());
                 model.addAttribute("target","/index");
                 break;
             }
             case ACTIVATE_ALREADY: {
-                model.addAttribute("msg",Const.ACTIVATE_ALREADY.getInfo());
+                model.addAttribute("msg", Notice.ACTIVATE_ALREADY.getInfo());
                 model.addAttribute("target","/index");
                 break;
             }
             case ACTIVATE_SUCCESS:{
-                model.addAttribute("msg",Const.ACTIVATE_SUCCESS.getInfo());
+                model.addAttribute("msg", Notice.ACTIVATE_SUCCESS.getInfo());
                 model.addAttribute("target","/login");
                 break;
             }

@@ -53,7 +53,7 @@ public class TicketInterceptor implements HandlerInterceptor {
         }
     }
 
-    // 最后释放 ThreadLocal 中的 user
+    // 最后释放 ThreadLocal 中的 user,防止内存泄漏
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         hostHolder.clear();

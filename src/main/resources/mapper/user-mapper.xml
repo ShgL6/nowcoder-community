@@ -18,11 +18,22 @@
         where id = #{id}
     </select>
 
+    <select id="selectByIds" resultType="User">
+        select <include refid="selectFields"></include>
+        from user
+        where id in
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
+
     <select id="selectByName" resultType="User">
         select <include refid="selectFields"></include>
         from user
         where username = #{username}
     </select>
+
+
 
     <select id="selectByEmail" resultType="User">
         select <include refid="selectFields"></include>

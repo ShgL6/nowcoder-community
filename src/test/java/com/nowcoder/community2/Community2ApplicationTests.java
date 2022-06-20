@@ -6,6 +6,7 @@ import com.nowcoder.community2.dao.*;
 import com.nowcoder.community2.entity.Comment;
 import com.nowcoder.community2.entity.DiscussPost;
 import com.nowcoder.community2.entity.LoginTicket;
+import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.utils.CommonUtils;
 import com.nowcoder.community2.utils.SensitiveFilter;
 import javafx.beans.binding.ObjectExpression;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -28,11 +30,12 @@ import org.thymeleaf.context.Context;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.sql.DataSource;
+import javax.swing.text.html.parser.Entity;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @SpringBootTest
 class Community2ApplicationTests {
@@ -103,6 +106,61 @@ class Community2ApplicationTests {
         }
     }
 
+    /**
+     * 测试opsForSet 遍历顺序——按插入顺序
+     */
+    @Test
+    void tq(){
+
+        String key = "k";
+        redisTemplate.opsForHash().put(key,"k1",new Date());
+        redisTemplate.opsForHash().put(key,"k2",new Date());
+        redisTemplate.opsForHash().put(key,"k3",new Date());
+        redisTemplate.opsForHash().put(key,"k4",new Date());
+        redisTemplate.opsForHash().put(key,"k5",new Date());
+
+
+        Map entries = redisTemplate.opsForHash().entries(key);
+        Set<Map.Entry> set = entries.entrySet();
+
+        // 降序
+        TreeSet<Map.Entry> treeSet = new TreeSet<Map.Entry>((e1,e2)->{
+            Date d1 = (Date) e1.getValue();
+            Date d2 = (Date) e2.getValue();
+            return d1.after(d2) ? -1 : 1;
+        });
+
+        treeSet.addAll(set);
+        for(Map.Entry e : treeSet){
+            System.out.println(e.getKey().toString() + "=====" + e.getValue().toString());
+        }
+    }
+
+
+    /**
+     * 测试 userMapper
+     */
+    @Test
+    void tr(){
+
+        List<Integer> integers = Arrays.asList(110, 111, 112, 113, 114, 115);
+        List<User> users = userMapper.selectByIds(integers);
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+
+    /**
+     * 测试 hashMap
+     */
+    @Test
+    void te(){
+        Map<String,Object> map = new HashMap<>();
+        map.put("1",new Date());
+        map.put("2",1);
+
+    }
 
     @Test
     void test1(){

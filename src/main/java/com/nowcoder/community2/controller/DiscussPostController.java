@@ -9,7 +9,7 @@ import com.nowcoder.community2.service.DiscussPostService;
 import com.nowcoder.community2.service.LikeService;
 import com.nowcoder.community2.service.UserService;
 import com.nowcoder.community2.utils.CommonUtils;
-import com.nowcoder.community2.utils.Const;
+import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.HostHolder;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +43,15 @@ public class DiscussPostController {
     public String post(String title,String content){
         User user = hostHolder.get();
         if(user == null){
-            return CommonUtils.getJSONString(403, Const.USER_NOT_LOGIN.getInfo());
+            return CommonUtils.getJSONString(403, Notice.USER_NOT_LOGIN.getInfo());
         }
         if(StringUtils.isBlank(title)){
-            return CommonUtils.getJSONString(100,Const.TITLE_EMPTY.getInfo());
+            return CommonUtils.getJSONString(100, Notice.TITLE_EMPTY.getInfo());
         }
 
         discussPostService.saveDiscussPost(user.getId(), title, content);
 
-        return CommonUtils.getJSONString(0,Const.PUBLISH_SUCCESS.getInfo());
+        return CommonUtils.getJSONString(0, Notice.PUBLISH_SUCCESS.getInfo());
 
     }
 
