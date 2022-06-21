@@ -93,11 +93,11 @@ public class LoginController {
         // 验证码存入 redis，将独特的 key 存入 Cookie 在客户端保存
         String captchaKey = RedisKeyUtil.getCaptchaKey();
         redisTemplate.opsForValue().set(captchaKey,text);
-        redisTemplate.expire(captchaKey,30, TimeUnit.SECONDS);
+        redisTemplate.expire(captchaKey,60, TimeUnit.SECONDS);
 
         Cookie cookie = new Cookie("captchaKey",captchaKey);
-        cookie.setMaxAge(30);
-        cookie.setPath("/login");
+        cookie.setMaxAge(60);
+        cookie.setPath("/community/login");
         response.addCookie(cookie);
 
 

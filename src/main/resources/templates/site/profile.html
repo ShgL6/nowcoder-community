@@ -86,7 +86,7 @@
 						<h5 class="mt-0 text-warning">
 							<span th:text="${user.username}">nowcoder</span>
 							<button type="button" th:if="${!isMe}" th:class="|btn ${hasFollowed ? 'btn-secondary' : 'btn-info'} btn-sm float-right mr-5 follow-btn|"
-									 th:onclick="|follow(${user.id},this)|" th:value="${hasFollowed ? '已关注' : '关注TA'}">
+									 th:onclick="|follow(${user.id},this)|" th:text="${hasFollowed ? '已关注' : '关注TA'}">
 								关注TA
 							</button>
 						</h5>
