@@ -1,7 +1,7 @@
 package com.nowcoder.community2.entity;
 
 import java.util.Date;
-
+@Deprecated
 public class LoginTicket {
 
     private int id;

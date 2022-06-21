@@ -1,6 +1,8 @@
 package com.nowcoder.community2.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.Producer;
 import com.nowcoder.community2.annotation.LoginRequired;
 import com.nowcoder.community2.entity.LoginTicket;
@@ -8,11 +10,15 @@ import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.service.LoginTicketService;
 import com.nowcoder.community2.service.UserService;
 
+import com.nowcoder.community2.utils.CommonUtils;
+import com.nowcoder.community2.utils.CookieUtil;
 import com.nowcoder.community2.utils.Notice;
+import com.nowcoder.community2.utils.RedisKeyUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -31,6 +37,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Controller
@@ -51,6 +58,8 @@ public class LoginController {
     @Autowired
     private Producer kaptchaProducer;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     @GetMapping("/register")
@@ -76,9 +85,22 @@ public class LoginController {
         String text = kaptchaProducer.createText();
         BufferedImage image = kaptchaProducer.createImage(text);
 
-        // 验证码存入 session
-        HttpSession session = request.getSession();
-        session.setAttribute("kaptcha",text);
+        /** 验证码存入 session
+         * HttpSession session = request.getSession();
+         * session.setAttribute("kaptcha",text);
+        **/
+
+        // 验证码存入 redis，将独特的 key 存入 Cookie 在客户端保存
+        String captchaKey = RedisKeyUtil.getCaptchaKey();
+        redisTemplate.opsForValue().set(captchaKey,text);
+        redisTemplate.expire(captchaKey,30, TimeUnit.SECONDS);
+
+        Cookie cookie = new Cookie("captchaKey",captchaKey);
+        cookie.setMaxAge(30);
+        cookie.setPath("/login");
+        response.addCookie(cookie);
+
+
         // 返回图片
         response.setContentType("image/png");
         try {
@@ -95,31 +117,45 @@ public class LoginController {
     public String login(
             String username,
             String password,
-            String verifyCode, // session 中的 kaptcha
+            String verifyCode,
             boolean rememberMe,
-            HttpSession session,
             HttpServletResponse response,
+            @CookieValue("captchaKey") String captchaKey,
             Model model
     ){
 
-        String code = (String) session.getAttribute("kaptcha");
+        /**
+        * String code = (String) session.getAttribute("kaptcha");
+        **/
+        String code = (String) redisTemplate.opsForValue().get(captchaKey);
         Map<String, Object> map = userService.login(username,password,verifyCode,code);
 
         // 成功登录
         if(map.containsKey("ticket")){
             User user = (User) map.get("user");
+            /**
+                String ticket = (String)map.get("ticket");
+                LoginTicket loginTicket = new LoginTicket();
+                loginTicket.setUserId(user.getId());
+                loginTicket.setStatus(0);
+                loginTicket.setTicket(ticket);
+                if(! rememberMe) loginTicket.setExpired(new Date(System.currentTimeMillis() + DEFAULT_EXPIRE));
+                else loginTicket.setExpired(new Date(System.currentTimeMillis() + REM_EXPIRE));
+
+                ticketService.saveLoginTicket(loginTicket);
+            **/
+
             String ticket = (String)map.get("ticket");
-            LoginTicket loginTicket = new LoginTicket();
-            loginTicket.setUserId(user.getId());
-            loginTicket.setStatus(0);
-            loginTicket.setTicket(ticket);
-            if(! rememberMe) loginTicket.setExpired(new Date(System.currentTimeMillis() + DEFAULT_EXPIRE));
-            else loginTicket.setExpired(new Date(System.currentTimeMillis() + REM_EXPIRE));
+            String ticketKey = RedisKeyUtil.getTicketKey(ticket);
+            redisTemplate.opsForValue().set(ticketKey, JSON.toJSONString(user));
 
-            ticketService.saveLoginTicket(loginTicket);
+            if(rememberMe){
+                redisTemplate.expire(ticketKey,REM_EXPIRE/1000,TimeUnit.SECONDS);
+            }else {
+                redisTemplate.expire(ticketKey,DEFAULT_EXPIRE/1000,TimeUnit.SECONDS);
+            }
 
-            //
-            Cookie cookie = new Cookie("ticket",ticket);
+            Cookie cookie = new Cookie("ticket",ticketKey);
             cookie.setPath(CONTEXT_PATH);
             cookie.setMaxAge(rememberMe ? (int)(REM_EXPIRE/1000 + TIME_DEF) : (int)(DEFAULT_EXPIRE/1000.0 + TIME_DEF));
             response.addCookie(cookie);

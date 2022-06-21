@@ -31,9 +31,11 @@ public class ServiceLogAspect {
 
         // 获取用户主机
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        if(requestAttributes == null){
+            // do nothing
+            return;
+        }
         String remoteHost = requestAttributes.getRequest().getRemoteHost();
-
-        //TODO
 
         // 获取时间
         String time = new SimpleDateFormat("yyyy-MM-ss HH:mm:ss").format(new Date());

@@ -1,14 +1,19 @@
 package com.nowcoder.community2.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.nowcoder.community2.dao.UserMapper;
 import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.utils.CommonUtils;
 import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.HostHolder;
+import com.nowcoder.community2.utils.RedisKeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -18,6 +23,7 @@ import org.thymeleaf.context.Context;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -31,6 +37,8 @@ public class UserService {
     private TemplateEngine templateEngine;
     @Autowired
     private HostHolder hostHolder;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Value("${domain}")
     String domain;
@@ -38,22 +46,66 @@ public class UserService {
     String from;
 
     public User findUserById(int id) {
-        return userMapper.selectById(id);
-    }
-
-    public User findUserByEmail(String email){
-        return userMapper.selectByEmail(email);
+        return findUser(id,null);
     }
 
     public User findUserByName(String userName) {
-        return userMapper.selectByName(userName);
+        return findUser(-1,userName);
     }
 
-    public void saveUser(User user){
-        userMapper.insertUser(user);
-    };
 
 
+    /**
+     * 用于缓存用户的一组方法
+     */
+     private void initCache(User user){
+         String userKey = RedisKeyUtil.getUserKey(user.getId());
+         String userByNameKey = RedisKeyUtil.getUserNameKey(user.getUsername());
+
+         redisTemplate.opsForValue().set(userKey, JSON.toJSONString(user));
+         redisTemplate.opsForValue().set(userByNameKey,JSON.toJSONString(user));
+
+         redisTemplate.expire(userKey,2, TimeUnit.DAYS);
+         redisTemplate.expire(userByNameKey,2, TimeUnit.DAYS);
+     }
+     private User findUser(int userId, String userName){
+
+         String userKey;
+         if(userId < 0 && !StringUtils.isBlank(userName)){
+            userKey = RedisKeyUtil.getUserNameKey(userName);
+         }else{
+             userKey = RedisKeyUtil.getUserKey(userId);
+         }
+
+         String userJSONString = (String) redisTemplate.opsForValue().get(userKey);
+
+         if(StringUtils.isBlank(userJSONString)){
+             User user = userMapper.selectById(userId);
+             initCache(user);
+             return user;
+         }else{
+             User user = JSONObject.parseObject(userJSONString, User.class);
+             return user;
+         }
+     }
+     private void flushCache(User user){
+         if(user.getId() > 0){
+             String userKey = RedisKeyUtil.getUserKey(user.getId());
+             redisTemplate.delete(userKey);
+         }
+         if(!StringUtils.isBlank(user.getUsername())){
+             String userByNameKey = RedisKeyUtil.getUserNameKey(user.getUsername());
+             redisTemplate.delete(userByNameKey);
+         }
+     }
+
+
+
+    /**
+     * 注册
+     * @param user
+     * @return
+     */
     public Map<String,Object> register(User user){
 
         HashMap<String, Object> map = new HashMap<>();
@@ -102,6 +154,7 @@ public class UserService {
         newUser.setStatus(0);
 //        newUser.setType();
         userMapper.insertUser(newUser);
+        initCache(newUser);
 
         // 4. 生成激活链接并发送邮件
         String activationUrl = domain + "register/" + String.valueOf(newUser.getId()) + "/" +activationCode;
@@ -130,7 +183,12 @@ public class UserService {
         return map;
     }
 
-
+    /**
+     * 激活
+     * @param id
+     * @param activationCode
+     * @return
+     */
     public Notice activate(String id, String activationCode){
         User userById = userMapper.selectById(Integer.valueOf(id));
         if(userById == null || !userById.getActivationCode().equals(activationCode)){
@@ -146,7 +204,14 @@ public class UserService {
     }
 
 
-
+    /**
+     * 登录
+     * @param username
+     * @param password
+     * @param verifyCode
+     * @param code
+     * @return
+     */
     public Map<String,Object> login(
             String username,
             String password,
@@ -171,7 +236,8 @@ public class UserService {
         }
 
         // 2.查询用户是否存在，密码是否正确
-        User user = userMapper.selectByName(username);
+        // User user = userMapper.selectByName(username);
+        User user = findUserByName(username);
         if(user == null){
             map.put("usernameMsg", Notice.USER_NOT_EXIST.getInfo());
             return map;
@@ -193,11 +259,31 @@ public class UserService {
     }
 
 
+    /**
+     * 更新头像
+     * @param id
+     * @param headerUrl
+     * @return
+     */
     public int modifyUserHeader(int id,String headerUrl){
-        return userMapper.updateHeader(id, headerUrl);
+        int result = userMapper.updateHeader(id, headerUrl);
+
+        // 刷新缓存
+        User user = new User();
+        user.setId(id);
+        flushCache(user);
+
+        return result;
     }
 
 
+    /**
+     * 更改密码
+     * @param oldPassword
+     * @param newPassword
+     * @param confirmPassword
+     * @return
+     */
     public Map<String,Object> changePassword(String oldPassword,String newPassword,String confirmPassword){
         Map<String,Object> map = new HashMap<>();
         // 检验新密码
@@ -223,11 +309,25 @@ public class UserService {
         }
 
         userMapper.updatePassword(user.getId(),password);
+        // 刷新缓存
+        flushCache(user);
+
         return map;
     }
 
-
+    /**
+     * 查询用户
+     * @param userIds
+     * @return
+     */
     public List<User> findUserByIds(List<Integer> userIds) {
-        return userMapper.selectByIds(userIds);
+        List<User> users = userMapper.selectByIds(userIds);
+
+        // 初始化缓存
+        for(User user : users){
+            initCache(user);
+        }
+
+        return users;
     }
 }

@@ -6,6 +6,7 @@ import com.nowcoder.community2.entity.LoginTicket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Deprecated
 @Service
 public class LoginTicketService {
 
