@@ -3,10 +3,7 @@ package com.nowcoder.community2;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nowcoder.community2.dao.*;
-import com.nowcoder.community2.entity.Comment;
-import com.nowcoder.community2.entity.DiscussPost;
-import com.nowcoder.community2.entity.LoginTicket;
-import com.nowcoder.community2.entity.User;
+import com.nowcoder.community2.entity.*;
 import com.nowcoder.community2.utils.CommonUtils;
 import com.nowcoder.community2.utils.SensitiveFilter;
 import javafx.beans.binding.ObjectExpression;
@@ -191,6 +188,24 @@ class Community2ApplicationTests {
         redisTemplate.opsForValue().set("1",String.valueOf(1));
 
         Integer i = Integer.valueOf((String) redisTemplate.opsForValue().get("1")) ;
+    }
+
+
+
+    @Test
+    void ty(){
+        /**
+            System.out.println("所有未读："+ messageMapper.selectNoticeLetterCount(155,null,0));
+            System.out.println("like 未读："+ messageMapper.selectNoticeLetterCount(155,"like",0));
+            System.out.println("like 所有："+messageMapper.selectNoticeLetterCount(155,"like",-1));
+            System.out.println("comment 未读："+ messageMapper.selectNoticeLetterCount(155,"comment",0));
+            System.out.println("comment 所有："+messageMapper.selectNoticeLetterCount(155,"like",-1));
+        **/
+        List<Message> like = messageMapper.selectNoticeLetters(155, "like", 0, 5);
+        for (Message m :
+                like) {
+            System.out.println(m.getId());
+        }
     }
 
 

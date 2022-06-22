@@ -61,4 +61,5 @@ public class CommunityConfig {
         return  redisTemplate;
     }
 
+
 }

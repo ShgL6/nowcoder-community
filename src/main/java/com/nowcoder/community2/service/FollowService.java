@@ -3,6 +3,7 @@ package com.nowcoder.community2.service;
 import com.nowcoder.community2.entity.Page;
 import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.utils.CommonUtils;
+import com.nowcoder.community2.utils.Const;
 import com.nowcoder.community2.utils.RedisKeyUtil;
 import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class FollowService {
 
         });
 
-        return isMember ? 0 : 1;
+        return isMember ? Const.UNFOLLOW_STATUS : Const.FOLLOW_STATUS;
     }
 
     /**

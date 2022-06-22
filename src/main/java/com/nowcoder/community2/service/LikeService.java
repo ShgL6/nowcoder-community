@@ -1,6 +1,7 @@
 package com.nowcoder.community2.service;
 
 import com.nowcoder.community2.utils.CommonUtils;
+import com.nowcoder.community2.utils.Const;
 import com.nowcoder.community2.utils.RedisKeyUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,14 @@ public class LikeService {
 
 
     // 点赞
-    public void like(int entityType,int entityId,int userId,int targetId){
+    public void like(int entityType,int entityId,int userId,int targetUserId){
 
         redisTemplate.execute(new SessionCallback() {
             @Override
             public Object execute(RedisOperations operations) throws DataAccessException {
 
                 String entityLikeKey = RedisKeyUtil.getEntityLikeKey(entityType, entityId);
-                String userLikeKey = RedisKeyUtil.getUserLikeKey(targetId);
+                String userLikeKey = RedisKeyUtil.getUserLikeKey(targetUserId);
                 // 是否已点赞
                 boolean isMember = redisTemplate.opsForSet().isMember(entityLikeKey,userId);
 
@@ -68,6 +69,6 @@ public class LikeService {
     public int getEntityLikeStatus(int entityType, int entityId, int userId) {
 
         String entityLikeKey = RedisKeyUtil.getEntityLikeKey(entityType, entityId);
-        return redisTemplate.opsForSet().isMember(entityLikeKey,userId) ? 1 : 0;
+        return redisTemplate.opsForSet().isMember(entityLikeKey,userId) ? Const.LIKE_STATUS : Const.UNLIKE_STATUS;
     }
 }

@@ -1,15 +1,13 @@
 package com.nowcoder.community2.controller;
 
 import com.nowcoder.community2.annotation.LoginRequired;
+import com.nowcoder.community2.component.EventProducer;
 import com.nowcoder.community2.entity.Message;
 import com.nowcoder.community2.entity.Page;
 import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.service.MessageService;
 import com.nowcoder.community2.service.UserService;
-import com.nowcoder.community2.utils.CommonUtils;
-import com.nowcoder.community2.utils.Notice;
-import com.nowcoder.community2.utils.HostHolder;
-import com.nowcoder.community2.utils.SensitiveFilter;
+import com.nowcoder.community2.utils.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,6 +29,8 @@ public class MessageController {
     private HostHolder hostHolder;
     @Autowired
     private SensitiveFilter sensitiveFilter;
+
+
 
     @LoginRequired
     @GetMapping("/letter/list/{userId}")
@@ -159,7 +159,47 @@ public class MessageController {
 
         messageService.saveMessage(message);
 
+
         return CommonUtils.getJSONString(0, Notice.SEND_SUCCESS.getInfo());
+    }
+
+    @LoginRequired
+    @GetMapping("/notice/list/{userId}")
+    public String getNotices(@PathVariable("userId") int userId, Model model){
+
+        // comment
+        int all_Comment_Notice_Count = messageService.findLetterCount(userId, Const.TOPIC_COMMENT, Const.MESSAGE_UNLIMITED);
+        int unchecked_Comment_Notice_Count = messageService.findLetterCount(userId, Const.TOPIC_COMMENT, Const.MESSAGE_UNCHECKED);
+        List<Message> last_Comment_NoticeLetter = messageService.findNoticeLetters(userId, Const.TOPIC_COMMENT, 0, 1);
+
+        // like
+        int all_Like_Notice_Count = messageService.findLetterCount(userId, Const.TOPIC_LIKE, Const.MESSAGE_UNLIMITED);
+        int unchecked_Like_Notice_Count = messageService.findLetterCount(userId, Const.TOPIC_LIKE, Const.MESSAGE_UNCHECKED);
+        List<Message> last_Like_NoticeLetter = messageService.findNoticeLetters(userId, Const.TOPIC_LIKE, 0, 1);
+
+        // follow
+        int all_Follow_Notice_Count = messageService.findLetterCount(userId, Const.TOPIC_FOLLOW, Const.MESSAGE_UNLIMITED);
+        int unchecked_Follow_Notice_Count = messageService.findLetterCount(userId, Const.TOPIC_FOLLOW, Const.MESSAGE_UNCHECKED);
+        List<Message> last_Follow_NoticeLetter = messageService.findNoticeLetters(userId, Const.TOPIC_FOLLOW, 0, 1);
+
+        model.addAttribute("allCommentCount",all_Comment_Notice_Count);
+        model.addAttribute("uncheckedCommentCount",unchecked_Comment_Notice_Count);
+        model.addAttribute("allLikeCount",all_Like_Notice_Count);
+        model.addAttribute("uncheckedLikeCount",unchecked_Like_Notice_Count);
+        model.addAttribute("allFollowCount",all_Follow_Notice_Count);
+        model.addAttribute("uncheckedFollowCount",unchecked_Follow_Notice_Count);
+
+        if(last_Comment_NoticeLetter != null && !last_Comment_NoticeLetter.isEmpty()){
+            model.addAttribute("lastComment",last_Comment_NoticeLetter.get(0));
+        }
+        if(last_Like_NoticeLetter != null && !last_Like_NoticeLetter.isEmpty()){
+            model.addAttribute("lastLike",last_Like_NoticeLetter.get(0));
+        }
+        if(last_Follow_NoticeLetter != null && !last_Follow_NoticeLetter.isEmpty()){
+            model.addAttribute("lastFollow",last_Follow_NoticeLetter.get(0));
+        }
+
+        return "/site/notice";
     }
 
 

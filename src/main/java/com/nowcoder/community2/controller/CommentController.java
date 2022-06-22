@@ -1,9 +1,11 @@
 package com.nowcoder.community2.controller;
 
 import com.nowcoder.community2.annotation.LoginRequired;
+import com.nowcoder.community2.component.EventProducer;
 import com.nowcoder.community2.entity.Comment;
 import com.nowcoder.community2.service.CommentService;
 import com.nowcoder.community2.utils.CommonUtils;
+import com.nowcoder.community2.utils.Const;
 import com.nowcoder.community2.utils.HostHolder;
 import com.nowcoder.community2.utils.SensitiveFilter;
 import com.sun.deploy.net.HttpUtils;
@@ -27,6 +29,8 @@ public class CommentController {
     private HostHolder hostHolder;
     @Autowired
     private SensitiveFilter sensitiveFilter;
+    @Autowired
+    private EventProducer eventProducer;
 
     /**
      * 评论-须先登录
@@ -49,6 +53,15 @@ public class CommentController {
 
         // 同时更新 discuss_post 中的 comment_count,加事务处理
         commentService.saveComment(comment,postId);
+
+        if(comment.getEntityType() == Const.COM_POST){
+            eventProducer.send(
+                    Const.TOPIC_COMMENT,
+                    postId,
+                    comment.getUserId(),
+                    comment.getTargetId()
+            );
+        }
 
 
         return "redirect:/discussPost/detail/" + postId;

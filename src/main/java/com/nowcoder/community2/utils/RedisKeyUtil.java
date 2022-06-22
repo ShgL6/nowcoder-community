@@ -33,7 +33,7 @@ public class RedisKeyUtil {
     // 某个实体的赞
     // like:entity:entityType:entityId
     // entityType：帖子为 1 ，评论为 2
-    // 数据类型 zset
+    // 数据类型 set
     public static String getEntityLikeKey(int entityType,int entityId){
         return PREFIX_ENTITY_LIKE + SPILT + entityType + SPILT + entityId;
     }

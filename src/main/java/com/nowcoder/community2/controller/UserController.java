@@ -1,12 +1,14 @@
 package com.nowcoder.community2.controller;
 
 import com.nowcoder.community2.annotation.LoginRequired;
+import com.nowcoder.community2.component.EventProducer;
 import com.nowcoder.community2.entity.Page;
 import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.service.FollowService;
 import com.nowcoder.community2.service.LikeService;
 import com.nowcoder.community2.service.UserService;
 import com.nowcoder.community2.utils.CommonUtils;
+import com.nowcoder.community2.utils.Const;
 import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.HostHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +51,9 @@ public class UserController {
 
     @Autowired
     private HostHolder hostHolder;
+
+    @Autowired
+    private EventProducer eventProducer;
 
     @LoginRequired
     @GetMapping(value = "/setting")
@@ -201,6 +206,14 @@ public class UserController {
             return CommonUtils.getJSONString(-1,Notice.CANT_FOLLOW_SELF.getInfo());
         }
         int status = followService.follow(user.getId(), followeeId);
+
+        if(status == Const.FOLLOW_STATUS){
+            eventProducer.send(
+                    Const.TOPIC_FOLLOW,
+                    user.getId(),
+                    followeeId
+            );
+        }
 
         Map<String,Object> map = new HashMap<>();
         map.put("status",status);

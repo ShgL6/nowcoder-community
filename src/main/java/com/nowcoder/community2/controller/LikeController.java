@@ -1,9 +1,11 @@
 package com.nowcoder.community2.controller;
 
 import com.nowcoder.community2.annotation.LoginRequired;
+import com.nowcoder.community2.component.EventProducer;
 import com.nowcoder.community2.entity.User;
 import com.nowcoder.community2.service.LikeService;
 import com.nowcoder.community2.utils.CommonUtils;
+import com.nowcoder.community2.utils.Const;
 import com.nowcoder.community2.utils.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,15 +22,17 @@ public class LikeController {
     private LikeService likeService;
     @Autowired
     private HostHolder hostHolder;
+    @Autowired
+    private EventProducer eventProducer;
 
     @LoginRequired
     @ResponseBody
     @PostMapping("/like")
-    public String like(int entityType,int entityId,int targetId){
+    public String like(int entityType,int entityId,int targetUserId){
         User user = hostHolder.get();
         int userId = user.getId();
 
-        likeService.like(entityType,entityId,userId,targetId);
+        likeService.like(entityType,entityId,userId,targetUserId);
 
         long likeCount = likeService.getEntityLikeCount(entityType,entityId);
         int likeStatus = likeService.getEntityLikeStatus(entityType,entityId,userId);
@@ -36,7 +40,18 @@ public class LikeController {
         Map<String,Object> map = new HashMap<>();
         map.put("likeStatus",likeStatus);
         map.put("likeCount",likeCount);
-        String msg = likeStatus == 0 ? "已取消点赞！" : "点赞成功！";
+        String msg = likeStatus == Const.UNLIKE_STATUS ? "已取消点赞！" : "点赞成功！";
+
+        if(likeStatus == Const.LIKE_STATUS && entityType == Const.LIKE_POST){
+
+            eventProducer.send(
+                    Const.TOPIC_LIKE,
+                    entityId,
+                    userId,
+                    targetUserId
+            );
+        }
+
         return CommonUtils.getJSONString(0, msg, map);
     }
 

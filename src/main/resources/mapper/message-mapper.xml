@@ -17,7 +17,7 @@
         select count(*) from(
             select count(*)
             from message
-            where from_id = #{userId} or to_id = #{userId}
+            where from_id = #{userId} or (from_id != 0 and to_id = #{userId})
             group by conversation_id
         )as t
     </select>
@@ -45,6 +45,16 @@
         </if>
     </select>
 
+    <select id="selectNoticeLetterCount" resultType="int">
+        select count(*) from message
+        where from_id = 0 and to_id = #{userId}
+        <if test="conversationId!=null">
+            and conversation_id = #{conversationId}
+        </if>
+        <if test="status!=-1">
+            and status = #{status}
+        </if>
+    </select>
 
 
     <select id="selectLetters" resultType="Message">
@@ -54,6 +64,19 @@
         order by create_time desc
         limit  #{offset} , #{limit}
     </select>
+
+    <select id="selectNoticeLetters" resultType="Message">
+        select <include refid="selectFields"></include>
+        from message
+        where
+            from_id = 0
+            and to_id = #{userId}
+            and conversation_id = #{conversationId}
+        order by create_time desc
+        limit  #{offset} , #{limit}
+    </select>
+
+
 
     <update id="updateStatus">
         update message set status = #{status}
