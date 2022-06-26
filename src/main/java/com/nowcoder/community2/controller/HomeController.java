@@ -37,8 +37,6 @@ public class HomeController {
 
 
 
-    @Autowired
-    private MessageService messageService;
 
     @Autowired
     private HostHolder hostHolder;
@@ -65,13 +63,6 @@ public class HomeController {
             }
         }
         model.addAttribute("discussPosts", discussPosts);
-        User user = hostHolder.get();
-        int userId = 0;
-        if(user != null){
-            userId = hostHolder.get().getId();
-        }
-        int letterCount = messageService.findLetterCount(userId,null, 0);
-        model.addAttribute("letterCount",letterCount);
 
         return "index";
     }

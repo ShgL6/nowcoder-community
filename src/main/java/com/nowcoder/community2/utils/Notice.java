@@ -24,6 +24,9 @@ public enum Notice {
     SEND_SUCCESS("发送成功！"),
     SERVER_INTERN_ERROR("服务器内部错误！"),
     CANT_FOLLOW_SELF("不能关注自己！"),
+    TEXT_COMMENT("评论了你的帖子"),
+    TEXT_LIKE("点赞了你的帖子"),
+    TEXT_FOLLOW("关注了你"),
     LIKE_SUCCESS("点赞成功！");
 
 

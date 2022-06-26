@@ -27,7 +27,7 @@
 								<a class="nav-link" th:href="@{/index}">首页</a>
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser != null}">
-								<a class="nav-link position-relative" th:href="@{|/message/letter/list/${loginUser.id}|}" >消息<span class="badge badge-danger" th:if="${letterCount!=0}" th:text="${letterCount}">12</span></a>
+								<a class="nav-link position-relative" th:href="@{|/message/letter/list/${loginUser.id}|}" >消息<span class="badge badge-danger" th:if="${allUncheckedMessageCount!=null and allUncheckedMessageCount!=0 }" th:text="${allUncheckedMessageCount}">12</span></a>
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser == null}">
 								<a class="nav-link" th:href="@{/register}">注册</a>

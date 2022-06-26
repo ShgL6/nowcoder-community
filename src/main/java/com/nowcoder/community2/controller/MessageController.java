@@ -1,7 +1,10 @@
 package com.nowcoder.community2.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.nowcoder.community2.annotation.LoginRequired;
 import com.nowcoder.community2.component.EventProducer;
+import com.nowcoder.community2.entity.Event;
 import com.nowcoder.community2.entity.Message;
 import com.nowcoder.community2.entity.Page;
 import com.nowcoder.community2.entity.User;
@@ -31,19 +34,15 @@ public class MessageController {
     private SensitiveFilter sensitiveFilter;
 
 
-
     @LoginRequired
     @GetMapping("/letter/list/{userId}")
     public String getMessages(@PathVariable("userId") int userId, Page page, Model model){
 
         // 设置分页
-        page.setPath("/message/letter/"+userId);
+        page.setPath("/message/letter/list/"+userId);
         page.setRows(messageService.findConversationCount(userId));
 
-        // 私信总未读消息数 属性添加
-        int allUncheckedLetterCount = messageService.findLetterCount(userId, null, 0);
-        model.addAttribute("allUncheckedCount", allUncheckedLetterCount);
-
+        // 私信总未读消息数 属性添加 ——> 转至 MessageInterceptor
 
         // 装填视图层的对象
         List<String> conversationIds = messageService.findConversationIds(userId, page.getOffset(), page.getLimit());
@@ -89,7 +88,7 @@ public class MessageController {
 
         // 分页
         page.setPath("/message/letter/detail"+conversationId);
-        page.setRows(messageService.findLetterCount(0,conversationId,-1));
+        page.setRows(messageService.findLetterCount(0,conversationId,Const.MESSAGE_UNLIMITED));
 
         // 获取,装填会话对象
         User user = hostHolder.get();
@@ -189,18 +188,75 @@ public class MessageController {
         model.addAttribute("allFollowCount",all_Follow_Notice_Count);
         model.addAttribute("uncheckedFollowCount",unchecked_Follow_Notice_Count);
 
+
+        // 总未读通知 ——> 转至 MessageInterceptor
+
         if(last_Comment_NoticeLetter != null && !last_Comment_NoticeLetter.isEmpty()){
-            model.addAttribute("lastComment",last_Comment_NoticeLetter.get(0));
+            Message message = last_Comment_NoticeLetter.get(0);
+            Event event = JSONObject.parseObject(message.getContent(), Event.class);
+            User commentUser = userService.findUserById(event.getFromUserId());
+            model.addAttribute("lastComment",message);
+            model.addAttribute("commentUser",commentUser);
+
         }
         if(last_Like_NoticeLetter != null && !last_Like_NoticeLetter.isEmpty()){
-            model.addAttribute("lastLike",last_Like_NoticeLetter.get(0));
+            Message message = last_Like_NoticeLetter.get(0);
+            Event event = JSONObject.parseObject(message.getContent(), Event.class);
+            User likeUser = userService.findUserById(event.getFromUserId());
+            model.addAttribute("lastLike",message);
+            model.addAttribute("likeUser",likeUser);
         }
         if(last_Follow_NoticeLetter != null && !last_Follow_NoticeLetter.isEmpty()){
-            model.addAttribute("lastFollow",last_Follow_NoticeLetter.get(0));
+            Message message = last_Follow_NoticeLetter.get(0);
+            Event event = JSONObject.parseObject(message.getContent(), Event.class);
+            User followUser = userService.findUserById(event.getFromUserId());
+            model.addAttribute("lastFollow",message);
+            model.addAttribute("followUser",followUser);
         }
 
         return "/site/notice";
     }
+
+    @LoginRequired
+    @GetMapping("/notice/detail/{topic}")
+    public String getNoticeDetails(@PathVariable("topic") String topic, Page page,Model model){
+
+        User user = hostHolder.get();
+
+        page.setPath("/message/notice/detail/" + topic);
+        page.setRows(messageService.findNoticeLetterCount(user.getId(),topic,Const.MESSAGE_UNLIMITED));
+
+        List<Message> noticeLetters = messageService.findNoticeLetters(user.getId(), topic, page.getOffset(), page.getLimit());
+
+        List<HashMap<String,Object>> letters = new ArrayList<>();
+        for (Message letter : noticeLetters) {
+            HashMap<String,Object> vo = new HashMap<>();
+            vo.put("createTime",letter.getCreateTime());
+
+            Event event = JSONObject.parseObject(letter.getContent(), Event.class);
+            User fromUser = userService.findUserById(event.getFromUserId());
+            vo.put("fromUser",fromUser);
+
+            vo.put("entityId",event.getEntityId());
+
+            letters.add(vo);
+
+        }
+
+        String text;
+        if(topic.equals(Const.TOPIC_COMMENT)){
+            text = Notice.TEXT_COMMENT.getInfo();
+        }else if(topic.equals(Const.TOPIC_LIKE)){
+            text = Notice.TEXT_LIKE.getInfo();
+        }else{
+            text = Notice.TEXT_FOLLOW.getInfo();
+        }
+        model.addAttribute("text",text);
+        model.addAttribute("letters",letters);
+
+        return "/site/notice-detail";
+    }
+
 
 
 }

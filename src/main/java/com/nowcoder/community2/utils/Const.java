@@ -51,4 +51,9 @@ public class Const {
     public final static int UNFOLLOW_STATUS = 0;
     public final static int FOLLOW_STATUS = 1;
 
+    /**
+     * follow entityId
+     */
+    public final static int FOLLOW_ENTITY_ID = 0;
+
 }
