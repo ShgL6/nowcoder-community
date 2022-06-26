@@ -30,11 +30,12 @@ public class ServiceLogAspect {
         // 用户主机[ip] 上 在[xxx] 访问了 [方法]
 
         // 获取用户主机
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        if(requestAttributes == null){
+        // 对于非 web 请求线程暂不做日志记录
+        if(RequestContextHolder.getRequestAttributes() == null){
             // do nothing
             return;
         }
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         String remoteHost = requestAttributes.getRequest().getRemoteHost();
 
         // 获取时间

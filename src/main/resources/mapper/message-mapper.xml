@@ -24,7 +24,7 @@
 
     <select id="selectConversationIds" resultType="String">
         select conversation_id
-        from message where from_id = #{userId} or to_id = #{userId}
+        from message where from_id = #{userId} or (from_id != 0 and to_id = #{userId})
         group by conversation_id
         order by create_time desc
         limit  #{offset} , #{limit}
@@ -38,7 +38,7 @@
             and status = #{status}
         </if>
         <if test="userId!=0">
-            and to_id = #{userId}
+           and from_id != 0 and to_id = #{userId}
         </if>
         <if test="conversationId!=null">
             and conversation_id = #{conversationId}

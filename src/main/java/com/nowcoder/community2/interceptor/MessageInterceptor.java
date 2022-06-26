@@ -26,18 +26,20 @@ public class MessageInterceptor implements HandlerInterceptor {
 
         User user = hostHolder.get();
 
-        if(user == null){
-            return;
+        if(user != null && modelAndView != null){
+
+            int allUncheckedLetterCount = messageService.findLetterCount(user.getId(), null, Const.MESSAGE_UNCHECKED);
+            modelAndView.addObject("allUncheckedLetterCount",allUncheckedLetterCount);
+
+            int allUncheckedNoticeLetterCount = messageService.findNoticeLetterCount(user.getId(), null, Const.MESSAGE_UNCHECKED);
+            modelAndView.addObject("allUncheckedNoticeLetterCount",allUncheckedNoticeLetterCount);
+
+            int allUncheckedMessageCount = allUncheckedLetterCount + allUncheckedNoticeLetterCount;
+            modelAndView.addObject("allUncheckedMessageCount",allUncheckedMessageCount);
+
         }
 
-        int allUncheckedLetterCount = messageService.findLetterCount(user.getId(), null, Const.MESSAGE_UNCHECKED);
-        modelAndView.addObject("allUncheckedLetterCount",allUncheckedLetterCount);
 
-        int allUncheckedNoticeLetterCount = messageService.findNoticeLetterCount(user.getId(), null, Const.MESSAGE_UNCHECKED);
-        modelAndView.addObject("allUncheckedNoticeLetterCount",allUncheckedNoticeLetterCount);
-
-        int allUncheckedMessageCount = allUncheckedLetterCount + allUncheckedNoticeLetterCount;
-        modelAndView.addObject("allUncheckedMessageCount",allUncheckedMessageCount);
 
     }
 }

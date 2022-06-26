@@ -36,7 +36,7 @@ public class FollowService {
         String followeeKey = RedisKeyUtil.getFolloweeKey(followeeId);
         String followerKey = RedisKeyUtil.getFollowerKey(followerId);
 
-        Boolean isMember = redisTemplate.opsForHash().hasKey(followeeKey, followerKey);
+        Boolean isMember = redisTemplate.opsForHash().hasKey(followeeKey, followerId);
 
 
         redisTemplate.execute(new SessionCallback() {

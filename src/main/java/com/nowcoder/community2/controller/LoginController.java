@@ -74,8 +74,8 @@ public class LoginController {
 
     @LoginRequired
     @GetMapping("/logout")
-    public String logout(@CookieValue(value = "ticket",required = false) String ticket){
-        ticketService.modifyStatus(ticket,1);
+    public String logout(@CookieValue(value = "ticket",required = false) String ticketKey){
+        redisTemplate.delete(ticketKey);
         return "redirect:/login";
     }
 

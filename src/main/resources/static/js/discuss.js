@@ -1,10 +1,10 @@
 
-function like(btn,entityType,entityId,targetId) {
+function like(btn,entityType,entityId,targetUserId) {
 
 
     $.post(
         CONTEXT_PATH + "/like",
-        {"entityType":entityType,"entityId":entityId,"targetId":targetId},
+        {"entityType":entityType,"entityId":entityId,"targetUserId":targetUserId},
         function (data) {
             data = $.parseJSON(data);
             //回显信息

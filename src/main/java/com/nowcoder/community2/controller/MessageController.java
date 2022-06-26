@@ -229,6 +229,7 @@ public class MessageController {
         List<Message> noticeLetters = messageService.findNoticeLetters(user.getId(), topic, page.getOffset(), page.getLimit());
 
         List<HashMap<String,Object>> letters = new ArrayList<>();
+        List<Integer> conversationIds = new ArrayList<>();
         for (Message letter : noticeLetters) {
             HashMap<String,Object> vo = new HashMap<>();
             vo.put("createTime",letter.getCreateTime());
@@ -241,7 +242,11 @@ public class MessageController {
 
             letters.add(vo);
 
+            conversationIds.add(letter.getId());
+
         }
+
+        messageService.read(conversationIds);
 
         String text;
         if(topic.equals(Const.TOPIC_COMMENT)){

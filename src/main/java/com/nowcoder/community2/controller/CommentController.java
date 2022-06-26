@@ -10,10 +10,12 @@ import com.nowcoder.community2.utils.HostHolder;
 import com.nowcoder.community2.utils.SensitiveFilter;
 import com.sun.deploy.net.HttpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDate;
@@ -40,7 +42,7 @@ public class CommentController {
      */
     @LoginRequired
     @PostMapping("/comment/{postId}")
-    public String comment(@PathVariable("postId") int postId, Comment comment){
+    public String comment(@PathVariable("postId") int postId, @RequestParam(value = "targetUserId", defaultValue = "-1") int targetUserId, Comment comment){
         // Comment 属性中的 entityId entityType targetId content 由前端传入
 
         // 过滤敏感词
@@ -59,7 +61,7 @@ public class CommentController {
                     Const.TOPIC_COMMENT,
                     postId,
                     comment.getUserId(),
-                    comment.getTargetId()
+                    targetUserId
             );
         }
 
