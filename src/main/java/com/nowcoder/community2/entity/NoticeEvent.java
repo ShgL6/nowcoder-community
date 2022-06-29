@@ -4,7 +4,7 @@ package com.nowcoder.community2.entity;
  * 系统通知消息
  * 事件驱动
  */
-public class Event {
+public class NoticeEvent {
 
     /**
      * 该事件属于何种类型/主题
@@ -27,14 +27,14 @@ public class Event {
      */
     private int toUserId;
 
-    public Event() {
+    public NoticeEvent() {
     }
 
     public String getTopic() {
         return topic;
     }
 
-    public Event setTopic(String topic) {
+    public NoticeEvent setTopic(String topic) {
         this.topic = topic;
         return this;
     }
@@ -43,7 +43,7 @@ public class Event {
         return entityId;
     }
 
-    public Event setEntityId(int entityId) {
+    public NoticeEvent setEntityId(int entityId) {
         this.entityId = entityId;
         return this;
     }
@@ -52,7 +52,7 @@ public class Event {
         return fromUserId;
     }
 
-    public Event setFromUserId(int fromUserId) {
+    public NoticeEvent setFromUserId(int fromUserId) {
         this.fromUserId = fromUserId;
         return this;
     }
@@ -61,7 +61,7 @@ public class Event {
         return toUserId;
     }
 
-    public Event setToUserId(int toUserId) {
+    public NoticeEvent setToUserId(int toUserId) {
         this.toUserId = toUserId;
         return this;
     }

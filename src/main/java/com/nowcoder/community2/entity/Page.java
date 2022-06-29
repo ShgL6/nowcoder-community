@@ -11,7 +11,7 @@ public class Page {
     // 显示上限
     private int limit = 10;
     // 数据总数(用于计算总页数)
-    private int rows;
+    private long rows;
     // 查询路径(用于复用分页链接)
     private String path;
 
@@ -35,11 +35,11 @@ public class Page {
         }
     }
 
-    public int getRows() {
+    public long getRows() {
         return rows;
     }
 
-    public void setRows(int rows) {
+    public void setRows(long rows) {
         if (rows >= 0) {
             this.rows = rows;
         }
@@ -68,7 +68,7 @@ public class Page {
      *
      * @return
      */
-    public int getTotal() {
+    public long getTotal() {
         // rows / limit [+1]
         if (rows % limit == 0) {
             return rows / limit;
@@ -92,9 +92,9 @@ public class Page {
      *
      * @return
      */
-    public int getTo() {
+    public long getTo() {
         int to = current + 2;
-        int total = getTotal();
+        long total = getTotal();
         return to > total ? total : to;
     }
 

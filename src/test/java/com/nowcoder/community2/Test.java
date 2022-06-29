@@ -6,10 +6,7 @@ import com.nowcoder.community2.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Test {
 
@@ -38,11 +35,11 @@ public class Test {
 //        String msg = "点赞成功！";
 //        System.out.println(CommonUtils.getJSONString(0, msg, map));
 
-        T1 t = new T1();
-        String s = null;
-        System.out.println(s = JSON.toJSONString(t));
-
-        JSONObject.parseObject(s,T1.class).m();
+//        T1 t = new T1();
+//        String s = null;
+//        System.out.println(s = JSON.toJSONString(t));
+//
+//        JSONObject.parseObject(s,T1.class).m();
 
 
 

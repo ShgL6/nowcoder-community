@@ -1,14 +1,13 @@
 package com.nowcoder.community2.controller;
 
+import com.nowcoder.community2.component.EventProducer;
 import com.nowcoder.community2.entity.Comment;
 import com.nowcoder.community2.entity.DiscussPost;
 import com.nowcoder.community2.entity.Page;
 import com.nowcoder.community2.entity.User;
-import com.nowcoder.community2.service.CommentService;
-import com.nowcoder.community2.service.DiscussPostService;
-import com.nowcoder.community2.service.LikeService;
-import com.nowcoder.community2.service.UserService;
+import com.nowcoder.community2.service.*;
 import com.nowcoder.community2.utils.CommonUtils;
+import com.nowcoder.community2.utils.Const;
 import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.HostHolder;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +33,8 @@ public class DiscussPostController {
     private CommentService commentService;
     @Autowired
     private LikeService likeService;
+    @Autowired
+    private EventProducer eventProducer;
 
     @Autowired
     private HostHolder hostHolder;
@@ -49,7 +50,9 @@ public class DiscussPostController {
             return CommonUtils.getJSONString(100, Notice.TITLE_EMPTY.getInfo());
         }
 
-        discussPostService.saveDiscussPost(user.getId(), title, content);
+        DiscussPost post = discussPostService.saveDiscussPost(user.getId(), title, content);
+
+        eventProducer.send(Const.TOPIC_POST,post);
 
         return CommonUtils.getJSONString(0, Notice.PUBLISH_SUCCESS.getInfo());
 

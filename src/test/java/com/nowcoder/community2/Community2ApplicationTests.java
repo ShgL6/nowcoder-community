@@ -209,6 +209,24 @@ class Community2ApplicationTests {
     }
 
 
+    @Test
+    void tw(){
+        DiscussPost discussPost = new DiscussPost();
+        discussPost.setTitle("kkk");
+        discussPost.setContent("mmmm");
+        discussPost.setCreateTime(new Date());
+        discussPost.setCommentCount(0);
+        discussPost.setStatus(0);
+        discussPost.setType(0);
+        discussPost.setScore(0);
+        discussPost.setUserId(111);
+
+        discussPostMapper.insertDiscussPost(discussPost);
+        System.out.println(discussPost.getId());
+
+    }
+
+
 }
 
 

@@ -17,6 +17,7 @@ public class Const {
     public final static String TOPIC_LIKE = "like";
     public final static String TOPIC_COMMENT = "comment";
     public final static String TOPIC_FOLLOW = "follow";
+    public final static String TOPIC_POST = "post";
 
     /**
      * Message Status

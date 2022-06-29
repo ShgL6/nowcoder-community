@@ -1,10 +1,8 @@
 package com.nowcoder.community2.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nowcoder.community2.annotation.LoginRequired;
-import com.nowcoder.community2.component.EventProducer;
-import com.nowcoder.community2.entity.Event;
+import com.nowcoder.community2.entity.NoticeEvent;
 import com.nowcoder.community2.entity.Message;
 import com.nowcoder.community2.entity.Page;
 import com.nowcoder.community2.entity.User;
@@ -193,23 +191,23 @@ public class MessageController {
 
         if(last_Comment_NoticeLetter != null && !last_Comment_NoticeLetter.isEmpty()){
             Message message = last_Comment_NoticeLetter.get(0);
-            Event event = JSONObject.parseObject(message.getContent(), Event.class);
-            User commentUser = userService.findUserById(event.getFromUserId());
+            NoticeEvent noticeEvent = JSONObject.parseObject(message.getContent(), NoticeEvent.class);
+            User commentUser = userService.findUserById(noticeEvent.getFromUserId());
             model.addAttribute("lastComment",message);
             model.addAttribute("commentUser",commentUser);
 
         }
         if(last_Like_NoticeLetter != null && !last_Like_NoticeLetter.isEmpty()){
             Message message = last_Like_NoticeLetter.get(0);
-            Event event = JSONObject.parseObject(message.getContent(), Event.class);
-            User likeUser = userService.findUserById(event.getFromUserId());
+            NoticeEvent noticeEvent = JSONObject.parseObject(message.getContent(), NoticeEvent.class);
+            User likeUser = userService.findUserById(noticeEvent.getFromUserId());
             model.addAttribute("lastLike",message);
             model.addAttribute("likeUser",likeUser);
         }
         if(last_Follow_NoticeLetter != null && !last_Follow_NoticeLetter.isEmpty()){
             Message message = last_Follow_NoticeLetter.get(0);
-            Event event = JSONObject.parseObject(message.getContent(), Event.class);
-            User followUser = userService.findUserById(event.getFromUserId());
+            NoticeEvent noticeEvent = JSONObject.parseObject(message.getContent(), NoticeEvent.class);
+            User followUser = userService.findUserById(noticeEvent.getFromUserId());
             model.addAttribute("lastFollow",message);
             model.addAttribute("followUser",followUser);
         }
@@ -234,11 +232,11 @@ public class MessageController {
             HashMap<String,Object> vo = new HashMap<>();
             vo.put("createTime",letter.getCreateTime());
 
-            Event event = JSONObject.parseObject(letter.getContent(), Event.class);
-            User fromUser = userService.findUserById(event.getFromUserId());
+            NoticeEvent noticeEvent = JSONObject.parseObject(letter.getContent(), NoticeEvent.class);
+            User fromUser = userService.findUserById(noticeEvent.getFromUserId());
             vo.put("fromUser",fromUser);
 
-            vo.put("entityId",event.getEntityId());
+            vo.put("entityId", noticeEvent.getEntityId());
 
             letters.add(vo);
 

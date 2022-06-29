@@ -5,10 +5,13 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomConversions;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import java.util.Collections;
 import java.util.Properties;
 
 @Configuration
@@ -35,6 +38,8 @@ public class CommunityConfig {
         return kaptcha;
     }
 
+
+
     /**
      * redisTemplate
      * @param redisConnectionFactory
@@ -60,6 +65,10 @@ public class CommunityConfig {
 
         return  redisTemplate;
     }
+
+
+
+
 
 
 }
