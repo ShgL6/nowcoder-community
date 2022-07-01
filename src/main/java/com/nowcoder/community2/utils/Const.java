@@ -57,4 +57,13 @@ public class Const {
      */
     public final static int FOLLOW_ENTITY_ID = 0;
 
+
+    /**
+     * 权限设置
+     */
+    public final static String AUTHORITY_USER = "user";
+    public final static String AUTHORITY_ADMIN = "admin";
+    public final static String AUTHORITY_MODERATOR = "moderator";
+
+
 }

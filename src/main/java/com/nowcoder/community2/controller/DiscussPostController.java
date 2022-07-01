@@ -1,5 +1,6 @@
 package com.nowcoder.community2.controller;
 
+import com.nowcoder.community2.annotation.LoginRequired;
 import com.nowcoder.community2.component.EventProducer;
 import com.nowcoder.community2.entity.Comment;
 import com.nowcoder.community2.entity.DiscussPost;
@@ -10,6 +11,7 @@ import com.nowcoder.community2.utils.CommonUtils;
 import com.nowcoder.community2.utils.Const;
 import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.HostHolder;
+import lombok.extern.java.Log;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,6 +41,7 @@ public class DiscussPostController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @PostMapping("/post")
     @ResponseBody
     public String post(String title,String content){

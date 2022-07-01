@@ -10,6 +10,11 @@ import com.nowcoder.community2.utils.HostHolder;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -48,6 +53,12 @@ public class TicketInterceptor implements HandlerInterceptor {
             if(!StringUtils.isBlank(userJSONString)){
                 User user = JSONObject.parseObject(userJSONString, User.class);
                 hostHolder.set(user);
+
+                // 授权，存入 SecurityContext，以便 Security 作权限控制
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        user,user.getPassword(),userService.getAuthorities(user.getId())
+                );
+                SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
             }
 
         }

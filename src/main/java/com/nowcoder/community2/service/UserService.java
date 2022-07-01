@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nowcoder.community2.dao.UserMapper;
 import com.nowcoder.community2.entity.User;
-import com.nowcoder.community2.utils.CommonUtils;
-import com.nowcoder.community2.utils.Notice;
-import com.nowcoder.community2.utils.HostHolder;
-import com.nowcoder.community2.utils.RedisKeyUtil;
+import com.nowcoder.community2.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.common.protocol.types.Field;
@@ -16,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -329,5 +327,39 @@ public class UserService {
         }
 
         return users;
+    }
+
+    /**
+     * 查询用户权限
+     * @param userId
+     * @return
+     */
+     public Collection<? extends GrantedAuthority> getAuthorities(int userId){
+         User user = this.findUserById(userId);
+         List<GrantedAuthority> authorities = new ArrayList<>();
+         authorities.add(new GrantedAuthority() {
+             @Override
+             public String getAuthority() {
+                 switch (user.getType()){
+                     case 1 :
+                         return Const.AUTHORITY_ADMIN;
+                     case 2 :
+                         return Const.AUTHORITY_MODERATOR;
+                     default:
+                         return Const.AUTHORITY_USER;
+                 }
+
+             }
+         });
+
+         return  authorities;
+     }
+
+    /**
+     * 退出登录
+     * @param ticketKey
+     */
+    public void logout(String ticketKey) {
+        redisTemplate.delete(ticketKey);
     }
 }

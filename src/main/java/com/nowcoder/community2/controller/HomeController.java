@@ -72,5 +72,10 @@ public class HomeController {
         return "/error/500";
     }
 
+    @GetMapping("/error/404")
+    public String error404(){
+        return "/error/404";
+    }
+
 
 }

@@ -27,7 +27,8 @@ public enum Notice {
     TEXT_COMMENT("评论了你的帖子"),
     TEXT_LIKE("点赞了你的帖子"),
     TEXT_FOLLOW("关注了你"),
-    LIKE_SUCCESS("点赞成功！");
+    LIKE_SUCCESS("点赞成功！"),
+    NOT_HAVE_AUTHORITY("权限不足！");
 
 
     private String info;

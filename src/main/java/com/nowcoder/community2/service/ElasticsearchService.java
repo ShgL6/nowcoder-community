@@ -31,7 +31,7 @@ public class ElasticsearchService {
 
         List<DiscussPost> results = new ArrayList<>();
 
-        NativeSearchQuery countQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.multiMatchQuery("互联网", "content", "title")).build();
+        NativeSearchQuery countQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.multiMatchQuery(keyword, "content", "title")).build();
         long count = restTemplate.count(countQuery, DiscussPost.class);
         page.setRows(count);
 

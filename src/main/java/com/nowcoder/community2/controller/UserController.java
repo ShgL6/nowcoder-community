@@ -66,6 +66,7 @@ public class UserController {
      * 由于 MultipartFile 为 SpringMVC 的对象，所以将处理逻辑放在 Controller 层
      * @return
      */
+    @LoginRequired
     @PostMapping(value = "/header/upload")
     public String uploadHeader(MultipartFile multipartFile, Model model){
 
@@ -139,6 +140,7 @@ public class UserController {
      * @param model
      * @return
      */
+    @LoginRequired
     @PostMapping("/password")
     public String changePassword(String oldPassword,String newPassword,String confirmPassword,Model model){
 

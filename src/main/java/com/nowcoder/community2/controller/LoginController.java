@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -75,7 +76,9 @@ public class LoginController {
     @LoginRequired
     @GetMapping("/logout")
     public String logout(@CookieValue(value = "ticket",required = false) String ticketKey){
-        redisTemplate.delete(ticketKey);
+
+        userService.logout(ticketKey);
+        SecurityContextHolder.clearContext();
         return "redirect:/login";
     }
 
