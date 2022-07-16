@@ -19,6 +19,28 @@ public class Const {
     public final static String TOPIC_FOLLOW = "follow";
     public final static String TOPIC_POST = "post";
 
+
+    /**
+     * Post status
+     */
+    public final static int POST_NORMAL = 0;
+    public final static int POST_WONDERFUL = 1;
+    public final static int POST_DELETED = 2;
+
+    /**
+     * Post type
+     */
+    public final static int TYPE_NORMAL = 0;
+    public final static int TYPE_TOP = 1;
+
+    /**
+     * Post Ops
+     */
+    public static final String TOPIC_POST_TOP = "post_top";
+    public static final String TOPIC_POST_WONDER = "post_wonder";
+    public static final String TOPIC_POST_DELETE = "post_delete";
+
+
     /**
      * Message Status
      */
@@ -52,11 +74,6 @@ public class Const {
     public final static int UNFOLLOW_STATUS = 0;
     public final static int FOLLOW_STATUS = 1;
 
-    /**
-     * follow entityId
-     */
-    public final static int FOLLOW_ENTITY_ID = 0;
-
 
     /**
      * 权限设置
@@ -64,6 +81,12 @@ public class Const {
     public final static String AUTHORITY_USER = "user";
     public final static String AUTHORITY_ADMIN = "admin";
     public final static String AUTHORITY_MODERATOR = "moderator";
+
+    public final static int USER = 0;
+    public final static int ADMIN = 1;
+    public final static int MODERATOR = 2;
+
+
 
 
 }

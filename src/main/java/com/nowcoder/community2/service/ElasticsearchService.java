@@ -12,8 +12,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.document.Document;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -57,13 +60,42 @@ public class ElasticsearchService {
             results.add(post);
         }
 
-
         return results;
 
+    }
+
+    public boolean contains(DiscussPost post){
+        NativeSearchQuery query = new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchQuery("id", post.getId())).build();
+        SearchHits<DiscussPost> hits = restTemplate.search(query, DiscussPost.class);
+        if(hits != null && !hits.isEmpty()){
+            return true;
+        }
+        return false;
     }
 
     public void saveDiscussPost(DiscussPost post){
         repository.save(post);
     }
 
+    public void changeDiscussPostType(int id, int type) {
+
+        Document document = Document.create();
+        document.put("type",type);
+        UpdateQuery query = UpdateQuery.builder(String.valueOf(id)).withDocument(document).build();
+        restTemplate.update(query, IndexCoordinates.of("discusspost"));
+
+    }
+
+    public void changeDiscussPostStatus(int id, int status) {
+
+        Document document = Document.create();
+        document.put("status",status);
+        UpdateQuery query = UpdateQuery.builder(String.valueOf(id)).withDocument(document).build();
+        restTemplate.update(query, IndexCoordinates.of("discusspost"));
+
+    }
+
+    public void removeDiscussPostById(int id) {
+        restTemplate.delete(String.valueOf(id),DiscussPost.class);
+    }
 }

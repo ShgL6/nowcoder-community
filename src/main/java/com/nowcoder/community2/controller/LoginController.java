@@ -16,6 +16,7 @@ import com.nowcoder.community2.utils.Notice;
 import com.nowcoder.community2.utils.RedisKeyUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -130,7 +131,12 @@ public class LoginController {
         /**
         * String code = (String) session.getAttribute("kaptcha");
         **/
+        if(StringUtils.isBlank(captchaKey)){
+            model.addAttribute("codeMsg",Notice.CODE_EXPIRED.getInfo());
+            return "site/login";
+        }
         String code = (String) redisTemplate.opsForValue().get(captchaKey);
+
         Map<String, Object> map = userService.login(username,password,verifyCode,code);
 
         // 成功登录

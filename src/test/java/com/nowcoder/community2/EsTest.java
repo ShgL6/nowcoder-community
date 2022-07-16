@@ -15,8 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.document.Document;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 
 import java.util.List;
 import java.util.Map;
@@ -69,6 +72,23 @@ public class EsTest {
 //
 //        System.out.println(count);
 
+    }
+
+
+    @Test
+    void tu(){
+        Document document = Document.create();
+        document.put("type",0);
+        UpdateQuery query = UpdateQuery.builder("286").withDocument(document).build();
+        template.update(query, IndexCoordinates.of("discusspost"));
+
+        NativeSearchQuery q = new NativeSearchQueryBuilder().withQuery(QueryBuilders.matchQuery("id", "286")).build();
+        SearchHits<DiscussPost> hits = template.search(q, DiscussPost.class);
+        for(SearchHit<DiscussPost> hit : hits){
+            System.out.println("====================");
+            System.out.println(hit.getContent().getType());
+            System.out.println("====================");
+        }
     }
 
 }

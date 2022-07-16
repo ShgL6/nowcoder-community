@@ -341,9 +341,9 @@ public class UserService {
              @Override
              public String getAuthority() {
                  switch (user.getType()){
-                     case 1 :
+                     case Const.ADMIN :
                          return Const.AUTHORITY_ADMIN;
-                     case 2 :
+                     case Const.MODERATOR :
                          return Const.AUTHORITY_MODERATOR;
                      default:
                          return Const.AUTHORITY_USER;

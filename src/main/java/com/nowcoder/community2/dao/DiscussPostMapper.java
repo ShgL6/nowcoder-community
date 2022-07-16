@@ -22,9 +22,15 @@ public interface DiscussPostMapper {
 
     int insertDiscussPost(DiscussPost discussPost);
 
-    @Select({"select * from discuss_post where id = #{id}"})
+    @Select({"select * from discuss_post where id = #{id} and status != 2"})
     DiscussPost selectDiscussPostById(int id);
+
     @Update({"update discuss_post set comment_count = #{count} where id = #{id}"})
     int updateCommentCount(int id,int count);
 
+    @Update({"update discuss_post set type = #{type} where id = #{postId}"})
+    void updateType(int postId, int type);
+
+    @Update({"update discuss_post set status = #{status} where id = #{postId}"})
+    void updateStatus(int postId, int status);
 }

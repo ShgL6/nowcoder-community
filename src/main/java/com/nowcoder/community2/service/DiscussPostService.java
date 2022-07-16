@@ -49,9 +49,17 @@ public class DiscussPostService {
         return discussPost;
     }
 
+
     public DiscussPost findDiscussPostById(int id) {
         return discussPostMapper.selectDiscussPostById(id);
     }
 
 
+    public void changeType(int postId, int type) {
+        discussPostMapper.updateType(postId,type);
+    }
+
+    public void changeStatus(int postId, int status) {
+        discussPostMapper.updateStatus(postId,status);
+    }
 }

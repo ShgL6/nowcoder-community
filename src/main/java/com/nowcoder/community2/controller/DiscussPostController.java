@@ -65,6 +65,10 @@ public class DiscussPostController {
     public String details(@PathVariable("id") int id, Page page, Model model){
 
         DiscussPost post = discussPostService.findDiscussPostById(id);
+        if(post == null){
+            return "error/404";
+        }
+
         // 分页
         page.setPath("/discussPost/detail/"+id);
         page.setLimit(5);
@@ -137,7 +141,58 @@ public class DiscussPostController {
 
     }
 
+    @PostMapping("/top")
+    @ResponseBody
+    public String top(int postId){
 
+        DiscussPost post = discussPostService.findDiscussPostById(postId);
+        if(post == null){
+            return CommonUtils.getJSONString(-1,Notice.POST_NOT_EXIST.getInfo());
+        }
+
+        discussPostService.changeType(postId,Const.TYPE_TOP);
+
+        post.setType(Const.TYPE_TOP);
+        eventProducer.send(Const.TOPIC_POST_TOP,post);
+
+        return CommonUtils.getJSONString(0,Notice.TOP_SUCCESS.getInfo());
+    }
+
+
+    @PostMapping("/wonder")
+    @ResponseBody
+    public String wonder(int postId){
+
+        DiscussPost post = discussPostService.findDiscussPostById(postId);
+        if(post == null){
+            return CommonUtils.getJSONString(-1,Notice.POST_NOT_EXIST.getInfo());
+        }
+
+        discussPostService.changeStatus(postId,Const.POST_WONDERFUL);
+
+        post.setStatus(Const.POST_WONDERFUL);
+        eventProducer.send(Const.TOPIC_POST_WONDER,post);
+
+        return CommonUtils.getJSONString(0,Notice.WONDER_SUCCESS.getInfo());
+    }
+
+
+    @PostMapping("/delete")
+    @ResponseBody
+    public String delete(int postId){
+
+        DiscussPost post = discussPostService.findDiscussPostById(postId);
+        if(post == null){
+            return CommonUtils.getJSONString(-1,Notice.POST_NOT_EXIST.getInfo());
+        }
+
+        discussPostService.changeStatus(postId,Const.POST_DELETED);
+
+        post.setStatus(Const.POST_DELETED);
+        eventProducer.send(Const.TOPIC_POST_DELETE,post);
+
+        return CommonUtils.getJSONString(0,Notice.DELETE_SUCCESS.getInfo());
+    }
 
 
 }

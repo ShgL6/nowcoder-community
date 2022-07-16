@@ -28,6 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
         // 作权限控制
         http.authorizeRequests().antMatchers(
                 "/comment/**",
@@ -41,6 +42,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     Const.AUTHORITY_USER,
                     Const.AUTHORITY_ADMIN,
                     Const.AUTHORITY_MODERATOR)
+                .antMatchers("/discussPost/top",
+                        "/discussPost/wonder")
+                .hasAnyAuthority(Const.AUTHORITY_MODERATOR)
+                .antMatchers("/discussPost/delete")
+                .hasAnyAuthority(Const.AUTHORITY_ADMIN)
                 .anyRequest().permitAll()
                 .and().csrf().disable();
 
@@ -53,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         String header = request.getHeader("x-requested-with");
                         // 异步请求
                         if("XMLHttpRequest".equals(header)){
-                            String jsonString = CommonUtils.getJSONString(403, Notice.NOT_HAVE_AUTHORITY.getInfo());
+                            String jsonString = CommonUtils.getJSONString(403, Notice.USER_NOT_LOGIN.getInfo());
                             response.setContentType("application/plain;charset=utf-8");
                             response.getWriter().write(jsonString);
                         }else{
@@ -69,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         String header = request.getHeader("x-requested-with");
                         // 异步请求
                         if("XMLHttpRequest".equals(header)){
-                            String jsonString = CommonUtils.getJSONString(403, Notice.USER_NOT_LOGIN.getInfo());
+                            String jsonString = CommonUtils.getJSONString(403, Notice.NOT_HAVE_AUTHORITY.getInfo());
                             response.setContentType("application/plain;charset=utf-8");
                             response.getWriter().write(jsonString);
                         }else{

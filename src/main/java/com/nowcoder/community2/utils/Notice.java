@@ -14,6 +14,7 @@ public enum Notice {
     WELCOME("Welcome to Nowcoder Community !"),
     TITLE_EMPTY("标题不能为空！"),
     CODE_ERROR("验证码错误 !"),
+    CODE_EXPIRED("验证码过期！"),
     ACTIVATE_SUCCESS("账号激活成功 !"),
     ACTIVATE_FAIL("账号激活失败 !"),
     ACTIVATE_ALREADY("账号已经激活，不可重复激活 !"),
@@ -28,7 +29,11 @@ public enum Notice {
     TEXT_LIKE("点赞了你的帖子"),
     TEXT_FOLLOW("关注了你"),
     LIKE_SUCCESS("点赞成功！"),
-    NOT_HAVE_AUTHORITY("权限不足！");
+    NOT_HAVE_AUTHORITY("权限不足！"),
+    POST_NOT_EXIST("帖子不存在！"),
+    TOP_SUCCESS("置顶成功！"),
+    WONDER_SUCCESS("加精成功！"),
+    DELETE_SUCCESS("删除成功！");
 
 
     private String info;

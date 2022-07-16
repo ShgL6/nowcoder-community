@@ -41,7 +41,32 @@ public class EventConsumer {
     public void handlePostEvent(ConsumerRecord record){
         elasticsearchService
                 .saveDiscussPost(JSONObject.parseObject(record.value().toString(), DiscussPost.class));
-        System.out.println("=============");
+    }
+
+    @KafkaListener(topics = {Const.TOPIC_POST_TOP,Const.TOPIC_POST_WONDER,Const.TOPIC_POST_DELETE})
+    public void handlePostOpsEvent(ConsumerRecord record){
+
+        String topic = record.topic();
+        DiscussPost post = JSONObject.parseObject(record.value().toString(), DiscussPost.class);
+
+        if(!elasticsearchService.contains(post)){
+            elasticsearchService.saveDiscussPost(post);
+            return;
+        }
+
+        if(topic.equals(Const.TOPIC_POST_TOP)){
+            elasticsearchService.changeDiscussPostType(post.getId(),post.getType());
+            return;
+        }
+
+        if(post.getStatus() == Const.POST_DELETED){
+            elasticsearchService.removeDiscussPostById(post.getId());
+            return;
+        }
+
+        elasticsearchService.changeDiscussPostStatus(post.getId(),post.getStatus());
+
+
     }
 
 }
